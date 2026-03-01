@@ -2,59 +2,56 @@ name: Immo-Scanner Freiburg - Taeglicher Scan
 
 on:
   schedule:
-      # Laeuft taeglich um 15:30 UTC (= 16:30 MEZ / 17:30 MESZ)
-          # Scan um 15:30, SMS-Versand um ~16:00
-              - cron: '30 14 * * *'
-                workflow_dispatch:  # Manueller Start moeglich
+    - cron: '30 14 * * *'
+  workflow_dispatch:
 
-                jobs:
-                  scan:
-                      runs-on: ubuntu-latest
-                          timeout-minutes: 30
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
 
-                              steps:
-                                    - name: Repository auschecken
-                                            uses: actions/checkout@v4
+    steps:
+      - name: Repository auschecken
+        uses: actions/checkout@v4
 
-                                                  - name: Python 3.11 einrichten
-                                                          uses: actions/setup-python@v5
-                                                                  with:
-                                                                            python-version: '3.11'
-                                                                                      cache: 'pip'
+      - name: Python 3.11 einrichten
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
 
-                                                                                            - name: Abhaengigkeiten installieren
-                                                                                                    run: |
-                                                                                                              pip install --upgrade pip
-                                                                                                                        pip install -r requirements.txt
-                                                                                                                        
-                                                                                                                              - name: Playwright Browser installieren
-                                                                                                                                      run: |
-                                                                                                                                                playwright install chromium
-                                                                                                                                                          playwright install-deps chromium
-                                                                                                                                                          
-                                                                                                                                                                - name: SQLite Datenbank aus Cache laden
-                                                                                                                                                                        uses: actions/cache@v4
-                                                                                                                                                                                with:
-                                                                                                                                                                                          path: immo_scanner.db
-                                                                                                                                                                                                    key: immo-db-${{ github.run_number }}
-                                                                                                                                                                                                              restore-keys: |
-                                                                                                                                                                                                                          immo-db-
-                                                                                                                                                                                                                          
-                                                                                                                                                                                                                                - name: Immo-Scanner ausfuehren
-                                                                                                                                                                                                                                        env:
-                                                                                                                                                                                                                                                  TWILIO_ACCOUNT_SID: ${{ secrets.TWILIO_ACCOUNT_SID }}
-                                                                                                                                                                                                                                                            TWILIO_AUTH_TOKEN: ${{ secrets.TWILIO_AUTH_TOKEN }}
-                                                                                                                                                                                                                                                                      TWILIO_FROM_NUMBER: ${{ secrets.TWILIO_FROM_NUMBER }}
-                                                                                                                                                                                                                                                                                TWILIO_TO_NUMBER: ${{ secrets.TWILIO_TO_NUMBER }}
-                                                                                                                                                                                                                                                                                          GOOGLE_SHEETS_WEBAPP_URL: ${{ secrets.GOOGLE_SHEETS_WEBAPP_URL }}
-                                                                                                                                                                                                                                                                                                  run: |
-                                                                                                                                                                                                                                                                                                            python main.py
-                                                                                                                                                                                                                                                                                                            
-                                                                                                                                                                                                                                                                                                                  - name: Datenbank sichern (Artefakt)
-                                                                                                                                                                                                                                                                                                                          uses: actions/upload-artifact@v4
-                                                                                                                                                                                                                                                                                                                                  if: always()
-                                                                                                                                                                                                                                                                                                                                          with:
-                                                                                                                                                                                                                                                                                                                                                    name: immo-scanner-db-${{ github.run_number }}
-                                                                                                                                                                                                                                                                                                                                                              path: immo_scanner.db
-                                                                                                                                                                                                                                                                                                                                                                        retention-days: 30
-                                                                                                                                                                                                                                                                                                                                                                        
+      - name: Abhaengigkeiten installieren
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Playwright Browser installieren
+        run: |
+          playwright install chromium
+          playwright install-deps chromium
+
+      - name: SQLite Datenbank aus Cache laden
+        uses: actions/cache@v4
+        with:
+          path: immo_scanner.db
+          key: immo-db-${{ github.run_number }}
+          restore-keys: |
+            immo-db-
+
+      - name: Immo-Scanner ausfuehren
+        env:
+          TWILIO_ACCOUNT_SID: ${{ secrets.TWILIO_ACCOUNT_SID }}
+          TWILIO_AUTH_TOKEN: ${{ secrets.TWILIO_AUTH_TOKEN }}
+          TWILIO_FROM_NUMBER: ${{ secrets.TWILIO_FROM_NUMBER }}
+          TWILIO_TO_NUMBER: ${{ secrets.TWILIO_TO_NUMBER }}
+          GOOGLE_SHEETS_WEBAPP_URL: ${{ secrets.GOOGLE_SHEETS_WEBAPP_URL }}
+        run: |
+          python main.py
+
+      - name: Datenbank sichern (Artefakt)
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: immo-scanner-db-${{ github.run_number }}
+          path: immo_scanner.db
+          retention-days: 30

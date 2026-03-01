@@ -1,0 +1,69 @@
+# Immo-Scanner Freiburg - Konfiguration
+
+search:
+  location: "Freiburg im Breisgau"
+    radius_km: 30
+      rooms_min: 1
+        rooms_max: 4
+          price_max: 440000  # 4 Zimmer * 110.000
+            property_types:
+                - "Wohnung"
+                  exclude:
+                      - "Erbbaurecht"
+                          - "Zwangsversteigerung"
+                              - "Neubau"
+                                  - "Erstbezug"
+
+                                  # Kaufpreis-Grenze pro Zimmer
+                                  price_per_room_max: 110000
+
+                                  # Bierdeckelrechnung Parameter
+                                  bierdeckel:
+                                    # Normalvermietung
+                                      normal:
+                                          rent_per_sqm: 12.0        # EUR/m² kalt (konservativ Freiburg)
+                                              min_rendite_pct: 5.0      # Mind. Bruttomietrendite
+                                                # WG-Vermietung
+                                                  wg:
+                                                      rent_per_room: 420.0      # EUR kalt pro WG-Zimmer
+                                                          min_rendite_pct: 6.0      # Mind. Bruttomietrendite
+                                                            # Kaufnebenkosten Baden-Württemberg
+                                                              nebenkosten_ohne_makler_pct: 7.0   # GrESt 5% + Notar ~2%
+                                                                nebenkosten_mit_makler_pct: 10.57  # + Makler 3,57% inkl. MwSt
+
+                                                                # Bonus-Kriterien
+                                                                bonus:
+                                                                  leerstand: true           # Bonus wenn leerstehend
+                                                                    wg_geeignet: true         # Bonus wenn WG-geeignet (>= 2 Zi, Einzelzimmer > 10m²)
+                                                                      guter_stadtteil:
+                                                                          - "Wiehre"
+                                                                              - "Herdern"
+                                                                                  - "Stühlinger"
+                                                                                      - "Zähringen"
+                                                                                          - "Gundelfingen"
+                                                                                              - "Merzhausen"
+                                                                                                  - "Kirchzarten"
+
+                                                                                                  # Scoring-Gewichte (Summe sollte 100 ergeben)
+                                                                                                  scoring:
+                                                                                                    rendite_normal: 35
+                                                                                                      rendite_wg: 25
+                                                                                                        preis_pro_zimmer: 20
+                                                                                                          lage: 10
+                                                                                                            leerstand: 5
+                                                                                                              wg_geeignet: 5
+                                                                                                              
+                                                                                                              # Twilio SMS
+                                                                                                              twilio:
+                                                                                                                send_hour: 16  # Uhr wenn SMS gesendet wird
+                                                                                                                
+                                                                                                                # Scraping
+                                                                                                                scraping:
+                                                                                                                  headless: true
+                                                                                                                    timeout_seconds: 30
+                                                                                                                      delay_between_requests: 3  # Sekunden zwischen Requests
+                                                                                                                        platforms:
+                                                                                                                            - immoscout24
+                                                                                                                                - immowelt
+                                                                                                                                    - kleinanzeigen
+                                                                                                                                    

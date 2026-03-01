@@ -48,14 +48,14 @@ def init_db():
             sqm REAL,
             address TEXT,
             url TEXT,
-            score_normal REAL,
-            score_wg REAL,
             rendite_normal REAL,
             rendite_wg REAL,
             kaufpreis_faktor REAL,
-            gesamtscore INTEGER,
+            score INTEGER DEFAULT 0,
             leerstand INTEGER DEFAULT 0,
             wg_geeignet INTEGER DEFAULT 0,
+            preis_pro_zimmer REAL,
+            empfehlung TEXT,
             found_date TEXT,
             raw_data TEXT
         )
@@ -73,19 +73,27 @@ def save_listing(conn, listing):
     conn.execute("""
         INSERT OR IGNORE INTO listings
         (id, platform, title, price, rooms, sqm, address, url,
-         score_normal, score_wg, rendite_normal, rendite_wg,
-         kaufpreis_faktor, gesamtscore, leerstand, wg_geeignet,
+         rendite_normal, rendite_wg, kaufpreis_faktor, score,
+         leerstand, wg_geeignet, preis_pro_zimmer, empfehlung,
          found_date, raw_data)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     """, (
-        listing['id'], listing['platform'], listing['title'],
-        listing.get('price'), listing.get('rooms'), listing.get('sqm'),
-        listing.get('address', ''), listing.get('url', ''),
-        listing.get('score_normal', 0), listing.get('score_wg', 0),
-        listing.get('rendite_normal', 0), listing.get('rendite_wg', 0),
-        listing.get('kaufpreis_faktor', 0), listing.get('gesamtscore', 0),
+        listing['id'],
+        listing['platform'],
+        listing['title'],
+        listing.get('price'),
+        listing.get('rooms'),
+        listing.get('sqm'),
+        listing.get('address', ''),
+        listing.get('url', ''),
+        listing.get('rendite_normal', 0),
+        listing.get('rendite_wg', 0),
+        listing.get('kaufpreisfaktor', 0),
+        listing.get('score', 0),
         int(listing.get('leerstand', False)),
         int(listing.get('wg_geeignet', False)),
+        listing.get('preis_pro_zimmer', 0),
+        listing.get('empfehlung', ''),
         datetime.now().isoformat(),
         json.dumps(listing, ensure_ascii=False)
     ))
@@ -107,6 +115,7 @@ def export_to_google_sheet(listings, webapp_url, dry_run=False):
         rendite_wg_str = f"{l.get('rendite_wg', 0):.1f}%"
         ok_normal = "OK" if l.get('rendite_normal', 0) >= 5.0 else "NEIN"
         ok_wg = "OK" if l.get('rendite_wg', 0) >= 6.0 else "NEIN"
+
         data.append({
             "datum": datetime.now().strftime("%Y-%m-%d"),
             "platform": l.get('platform', ''),
@@ -120,10 +129,12 @@ def export_to_google_sheet(listings, webapp_url, dry_run=False):
             "ok_normal": ok_normal,
             "rendite_wg": rendite_wg_str,
             "ok_wg": ok_wg,
-            "kauf_faktor": round(l.get('kaufpreis_faktor', 0), 1),
-            "score": l.get('gesamtscore', 0),
+            "kauf_faktor": round(l.get('kaufpreisfaktor', 0), 1),
+            "score": l.get('score', 0),
             "leerstand": "Ja" if l.get('leerstand') else "Nein",
-            "wg_geeignet": "Ja" if l.get('wg_geeignet') else "Nein"
+            "wg_geeignet": "Ja" if l.get('wg_geeignet') else "Nein",
+            "empfehlung": l.get('empfehlung', ''),
+            "preis_pro_zimmer": round(l.get('preis_pro_zimmer', 0)),
         })
 
     try:
@@ -160,14 +171,14 @@ def send_sms(listings, config, dry_run=False):
     if not listings:
         body = f"[Immo-Scanner Freiburg] {datetime.now().strftime('%d.%m.%Y')}: Keine neuen Objekte gefunden."
     else:
-        top5 = sorted(listings, key=lambda x: x.get('gesamtscore', 0), reverse=True)[:5]
+        top5 = sorted(listings, key=lambda x: x.get('score', 0), reverse=True)[:5]
         lines = [f"Immo-Scanner {datetime.now().strftime('%d.%m.')}: {len(listings)} neue Objekte!"]
         for i, l in enumerate(top5, 1):
             preis_k = int(l.get('price', 0) / 1000)
             lines.append(
                 f"{i}. {l.get('rooms','?')}Zi {preis_k}k | "
                 f"N:{l.get('rendite_normal',0):.1f}% WG:{l.get('rendite_wg',0):.1f}% | "
-                f"Score:{l.get('gesamtscore',0)}"
+                f"Score:{l.get('score',0)}"
             )
         if len(listings) > 5:
             lines.append(f"+ {len(listings)-5} weitere >> Google Sheet")
@@ -219,18 +230,18 @@ def main():
                 f"{evaluated.get('price', 0):,.0f}EUR | "
                 f"Normal: {evaluated.get('rendite_normal', 0):.1f}% | "
                 f"WG: {evaluated.get('rendite_wg', 0):.1f}% | "
-                f"Score: {evaluated.get('gesamtscore', 0)}"
+                f"Score: {evaluated.get('score', 0)}"
             )
 
     logger.info(f"Neue Listings: {len(new_listings)} von {len(raw_listings)}")
 
     interessante = [
         l for l in new_listings
-        if l.get('gesamtscore', 0) >= 30
+        if l.get('score', 0) >= 30
         or l.get('rendite_normal', 0) >= 5.0
         or l.get('rendite_wg', 0) >= 6.0
     ]
-    interessante.sort(key=lambda x: x.get('gesamtscore', 0), reverse=True)
+    interessante.sort(key=lambda x: x.get('score', 0), reverse=True)
 
     logger.info(f"Interessante Listings: {len(interessante)}")
 

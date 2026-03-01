@@ -1,8 +1,49 @@
-# Immo-Scanner Freiburg - Konfiguration
+# Immo-Scanner Freiburg & Umgebung - Konfiguration
+
+# Standorte einzeln definiert (kein Radius)
+locations:
+  - name: "Freiburg im Breisgau"
+    slug_is24: "freiburg-im-breisgau"
+    slug_immowelt: "freiburg-im-breisgau"
+    slug_ka: "freiburg"
+    ka_code: "l9356"
+  - name: "Emmendingen"
+    slug_is24: "emmendingen"
+    slug_immowelt: "emmendingen"
+    slug_ka: "emmendingen"
+    ka_code: "l9289"
+  - name: "Denzlingen"
+    slug_is24: "denzlingen"
+    slug_immowelt: "denzlingen"
+    slug_ka: "denzlingen"
+    ka_code: "l9283"
+  - name: "Waldkirch"
+    slug_is24: "waldkirch"
+    slug_immowelt: "waldkirch"
+    slug_ka: "waldkirch"
+    ka_code: "l9372"
+  - name: "Kirchzarten"
+    slug_is24: "kirchzarten"
+    slug_immowelt: "kirchzarten"
+    slug_ka: "kirchzarten"
+    ka_code: "l9317"
+  - name: "Schallstadt"
+    slug_is24: "schallstadt"
+    slug_immowelt: "schallstadt"
+    slug_ka: "schallstadt"
+    ka_code: "l9356"
+  - name: "Weil am Rhein"
+    slug_is24: "weil-am-rhein"
+    slug_immowelt: "weil-am-rhein"
+    slug_ka: "weil-am-rhein"
+    ka_code: "l9377"
+  - name: "Loerrach"
+    slug_is24: "loerrach"
+    slug_immowelt: "loerrach"
+    slug_ka: "loerrach"
+    ka_code: "l9330"
 
 search:
-  location: "Freiburg im Breisgau"
-  radius_km: 30
   rooms_min: 1
   rooms_max: 4
   price_max: 440000  # 4 Zimmer * 110k = 440k max
@@ -40,20 +81,19 @@ scoring:
   leerstand: 5
   wg_geeignet: 5
 
-# Bevorzugte Stadtteile Freiburg
+# Bevorzugte Stadtteile / Orte
 gute_stadtteile:
+  - "Freiburg"
   - "Wiehre"
   - "Herdern"
   - "Stuehlinger"
-  - "Zähringen"
-  - "Guenterstal"
-  - "Littenweiler"
   - "Kirchzarten"
-  - "Merzhausen"
-  - "Gundelfingen"
-  - "Staufen"
-  - "Bad Krozingen"
-  - "Breisach"
+  - "Emmendingen"
+  - "Denzlingen"
+  - "Waldkirch"
+  - "Schallstadt"
+  - "Weil am Rhein"
+  - "Loerrach"
 
 # SMS Benachrichtigung
 notification:
@@ -66,10 +106,10 @@ notification:
 platforms:
   immoscout:
     enabled: true
-    max_pages: 5
+    max_pages: 3
   immowelt:
     enabled: true
-    max_pages: 3
+    max_pages: 2
   kleinanzeigen:
     enabled: true
     max_pages: 3

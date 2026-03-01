@@ -30,6 +30,13 @@ logger = logging.getLogger(__name__)
 DB_PATH = Path("immo_scanner.db")
 CONFIG_PATH = Path("config.yaml")
 
+EXPECTED_COLUMNS = [
+    'id', 'platform', 'title', 'price', 'rooms', 'sqm',
+    'address', 'url', 'rendite_normal', 'rendite_wg',
+    'kaufpreis_faktor', 'score', 'leerstand', 'wg_geeignet',
+    'preis_pro_zimmer', 'empfehlung', 'found_date', 'raw_data'
+]
+
 
 def load_config():
     with open(CONFIG_PATH, 'r', encoding='utf-8') as f:
@@ -38,6 +45,18 @@ def load_config():
 
 def init_db():
     conn = sqlite3.connect(DB_PATH)
+
+    # Check if table exists and has correct schema
+    try:
+        cur = conn.execute("PRAGMA table_info(listings)")
+        existing_cols = [row[1] for row in cur.fetchall()]
+        if existing_cols and set(existing_cols) != set(EXPECTED_COLUMNS):
+            logger.info("Schema geaendert - erstelle Tabelle neu")
+            conn.execute("DROP TABLE IF EXISTS listings")
+            conn.commit()
+    except Exception:
+        pass
+
     conn.execute("""
         CREATE TABLE IF NOT EXISTS listings (
             id TEXT PRIMARY KEY,

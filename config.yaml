@@ -1,6 +1,6 @@
 # Immo-Scanner Freiburg & Umgebung - Konfiguration
 
-# Standorte einzeln definiert (kein Radius)
+# Standorte einzeln definiert (kein Radius, sondern exakte Orte)
 locations:
   - name: "Freiburg im Breisgau"
     slug_is24: "freiburg-im-breisgau"
@@ -46,7 +46,7 @@ locations:
 search:
   rooms_min: 1
   rooms_max: 4
-  price_max: 440000  # 4 Zimmer * 110k = 440k max
+  price_max: 440000  # 4 Zimmer * 110k = 440k
   property_types:
     - "Wohnung"
   exclude:
@@ -55,8 +55,8 @@ search:
     - "Neubau"
     - "Erstbezug"
 
-# Kaufpreisgrenze pro Zimmer
-max_preis_pro_zimmer: 110000
+  # Kaufpreisgrenze pro Zimmer
+  max_preis_pro_zimmer: 110000
 
 # Bierdeckelrechnung Parameter
 bierdeckel:
@@ -94,13 +94,6 @@ gute_stadtteile:
   - "Schallstadt"
   - "Weil am Rhein"
   - "Loerrach"
-
-# SMS Benachrichtigung
-notification:
-  hour_utc: 14
-  minute_utc: 30
-  max_listings_in_sms: 5
-  min_score_for_sms: 30
 
 # Plattformen
 platforms:

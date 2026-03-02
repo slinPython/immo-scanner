@@ -15,10 +15,10 @@ from pathlib import Path
 
 import requests
 import yaml
-from twilio.rest import Client as TwilioClient
 
 from scraper import ImmobilienScraper
 from evaluator import BierdeckelEvaluator
+from notifier import notify
 
 logging.basicConfig(
     level=logging.INFO,
@@ -98,18 +98,18 @@ def save_listing(conn, listing):
         listing['id'],
         listing['platform'],
         listing['title'],
-        listing.get('price') or 0,
-        listing.get('rooms') or 0,
-        listing.get('sqm') or 0,
+        listing.get('price'),
+        listing.get('rooms'),
+        listing.get('sqm'),
         listing.get('address', ''),
         listing.get('url', ''),
-        listing.get('rendite_normal') or 0,
-        listing.get('rendite_wg') or 0,
-        listing.get('kaufpreisfaktor') or 0,
-        listing.get('score') or 0,
+        listing.get('rendite_normal'),
+        listing.get('rendite_wg'),
+        listing.get('kaufpreisfaktor'),
+        listing.get('score'),
         int(listing.get('leerstand', False)),
         int(listing.get('wg_geeignet', False)),
-        listing.get('preis_pro_zimmer') or 0,
+        listing.get('preis_pro_zimmer'),
         listing.get('empfehlung', ''),
         datetime.now().isoformat(),
         json.dumps(listing, ensure_ascii=False)
@@ -117,7 +117,7 @@ def save_listing(conn, listing):
     conn.commit()
 
 
-def export_to_google_sheet(listings, webapp_url, sheet_url='', dry_run=False):
+def export_to_google_sheet(listings, webapp_url, dry_run=False):
     if dry_run:
         logger.info(f"[DRY-RUN] Wuerde {len(listings)} Eintraege ins Google Sheet schreiben")
         return True
@@ -128,17 +128,17 @@ def export_to_google_sheet(listings, webapp_url, sheet_url='', dry_run=False):
 
     data = []
     for l in listings:
-        rn = l.get('rendite_normal') or 0
-        qm = l.get('sqm') or 0
-        preis = l.get('price') or 0
-        qm_preis = round(preis / qm) if qm > 0 else 0
-        # Jahreskaltmiete schaetzen: Kaufpreis / Kaufpreisfaktor
-        kaufpreis_faktor = l.get('kaufpreisfaktor') or 0
-        jahreskaltmiete = round(preis / kaufpreis_faktor) if kaufpreis_faktor > 0 else 0
-        rendite_str = f"{rn:.1f}%"
+        rn = l.get('rendite_normal')
+        sqm_val = l.get('sqm')
+        preis = l.get('price')
+        qm_preis = round(preis / sqm_val) if preis and sqm_val else 0
 
+        kaufpreis_faktor = l.get('kaufpreisfaktor')
+        jahreskaltmiete = round(preis / kaufpreis_faktor) if preis and kaufpreis_faktor else 0
+
+        rendite_str = f"{rn:.1f}%"
         adresse = l.get('address', '')
-        # Versuche Stadt und Strasse zu trennen
+
         if ',' in adresse:
             parts = adresse.rsplit(',', 1)
             strasse = parts[0].strip()
@@ -148,21 +148,21 @@ def export_to_google_sheet(listings, webapp_url, sheet_url='', dry_run=False):
             stadt = ''
 
         data.append({
-            "status": "",
+            "status": '',
             "url": l.get('url', ''),
-            "expose": "",
+            "expose": '',
             "stadt": stadt,
             "strasse": strasse,
             "preis": preis,
-            "zimmer": l.get('rooms') or 0,
+            "zimmer": l.get('rooms'),
             "makler": l.get('makler', ''),
-            "notiz": "",
-            "qm": qm,
+            "notiz": '',
+            "qm": sqm_val,
             "qm_preis": qm_preis,
             "jahreskaltmiete": jahreskaltmiete,
             "rendite": rendite_str,
             "baujahr": l.get('baujahr', ''),
-            "notiz2": "",
+            "notiz2": ''
         })
 
     try:
@@ -182,54 +182,6 @@ def export_to_google_sheet(listings, webapp_url, sheet_url='', dry_run=False):
         return False
 
 
-def send_sms(listings, config, dry_run=False):
-    account_sid = os.environ.get('TWILIO_ACCOUNT_SID')
-    auth_token = os.environ.get('TWILIO_AUTH_TOKEN')
-    from_number = os.environ.get('TWILIO_FROM_NUMBER')
-    to_number = os.environ.get('TWILIO_TO_NUMBER')
-    sheet_url = os.environ.get('GOOGLE_SHEETS_URL', '')
-
-    if dry_run:
-        logger.info(f"[DRY-RUN] Wuerde SMS senden mit {len(listings)} Objekten")
-        return True
-
-    if not all([account_sid, auth_token, from_number, to_number]):
-        logger.warning("Twilio-Credentials fehlen - SMS uebersprungen")
-        return False
-
-    if not listings:
-        body = f"[Immo-Scanner Freiburg] {datetime.now().strftime('%d.%m.%Y')}: Keine neuen Objekte gefunden."
-        if sheet_url:
-            body += f"\n{sheet_url}"
-    else:
-        top5 = sorted(listings, key=lambda x: x.get('score') or 0, reverse=True)[:5]
-        lines = [f"Immo-Scanner {datetime.now().strftime('%d.%m.')}: {len(listings)} neue Objekte!"]
-        for i, l in enumerate(top5, 1):
-            preis_k = int((l.get('price') or 0) / 1000)
-            rn = l.get('rendite_normal') or 0
-            rw = l.get('rendite_wg') or 0
-            sc = l.get('score') or 0
-            lines.append(
-                f"{i}. {l.get('rooms','?')}Zi {preis_k}k | "
-                f"N:{rn:.1f}% WG:{rw:.1f}% | "
-                f"Score:{sc}"
-            )
-        if len(listings) > 5:
-            lines.append(f"+ {len(listings)-5} weitere")
-        if sheet_url:
-            lines.append(f"{sheet_url}")
-        body = "\n".join(lines)
-
-    try:
-        client = TwilioClient(account_sid, auth_token)
-        message = client.messages.create(body=body, from_=from_number, to=to_number)
-        logger.info(f"SMS gesendet: {message.sid}")
-        return True
-    except Exception as e:
-        logger.error(f"SMS senden fehlgeschlagen: {e}")
-        return False
-
-
 def main():
     parser = argparse.ArgumentParser(description='Immo-Scanner Freiburg')
     parser.add_argument('--dry-run', action='store_true', help='Testlauf')
@@ -245,8 +197,7 @@ def main():
     conn = init_db()
     evaluator = BierdeckelEvaluator(config)
     scraper = ImmobilienScraper(config)
-
-    webapp_url = os.environ.get('GOOGLE_SHEETS_WEBAPP_URL', '')
+    webapp_url = os.environ.get('GOOGLE_SHEETS_WEBAPP_URL')
 
     try:
         raw_listings = scraper.scrape_all(limit=args.limit)
@@ -261,13 +212,14 @@ def main():
             evaluated = evaluator.evaluate(listing)
             save_listing(conn, evaluated)
             new_listings.append(evaluated)
-            price_val = evaluated.get('price') or 0
-            rn_val = evaluated.get('rendite_normal') or 0
-            rw_val = evaluated.get('rendite_wg') or 0
-            sc_val = evaluated.get('score') or 0
+
+            price_val = evaluated.get('price')
+            rn_val = evaluated.get('rendite_normal')
+            rw_val = evaluated.get('rendite_wg')
+            sc_val = evaluated.get('score')
             logger.info(
                 f"NEU: [{evaluated['platform']}] {evaluated['title']} | "
-                f"{price_val:,.0f}EUR | "
+                f"{price_val:,.0f} EUR | "
                 f"Normal: {rn_val:.1f}% | "
                 f"WG: {rw_val:.1f}% | "
                 f"Score: {sc_val}"
@@ -277,18 +229,17 @@ def main():
 
     interessante = [
         l for l in new_listings
-        if (l.get('score') or 0) >= 30
-        or (l.get('rendite_normal') or 0) >= 5.0
-        or (l.get('rendite_wg') or 0) >= 6.0
+        if (l.get('score', 0) > 0) and
+           (l.get('rendite_normal', 0) >= 5.0 or
+            l.get('rendite_wg', 0) >= 6.0)
     ]
-    interessante.sort(key=lambda x: x.get('score') or 0, reverse=True)
-
+    interessante.sort(key=lambda x: x.get('score', 0), reverse=True)
     logger.info(f"Interessante Listings: {len(interessante)}")
 
     if interessante:
         export_to_google_sheet(interessante, webapp_url, dry_run=args.dry_run)
 
-    send_sms(interessante, config, dry_run=args.dry_run)
+    notify(interessante, config, dry_run=args.dry_run)
 
     conn.close()
     logger.info("Immo-Scanner abgeschlossen")

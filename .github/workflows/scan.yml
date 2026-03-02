@@ -5,6 +5,11 @@ on:
     - cron: '30 14 * * *'
   workflow_dispatch:
 
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
 jobs:
   scan:
     runs-on: ubuntu-22.04
@@ -29,7 +34,7 @@ jobs:
         run: |
           playwright install chromium --with-deps
 
-      - name: SQLite Datenbank aus Cache laden
+      - name: SQLite Datenbank aus Cache
         uses: actions/cache@v4
         with:
           path: immo_scanner.db
@@ -39,12 +44,7 @@ jobs:
 
       - name: Immo-Scanner ausfuehren
         env:
-          TWILIO_ACCOUNT_SID: ${{ secrets.TWILIO_ACCOUNT_SID }}
-          TWILIO_AUTH_TOKEN: ${{ secrets.TWILIO_AUTH_TOKEN }}
-          TWILIO_FROM_NUMBER: ${{ secrets.TWILIO_FROM_NUMBER }}
-          TWILIO_TO_NUMBER: ${{ secrets.TWILIO_TO_NUMBER }}
           GOOGLE_SHEETS_WEBAPP_URL: ${{ secrets.GOOGLE_SHEETS_WEBAPP_URL }}
-          GOOGLE_SHEETS_URL: ${{ secrets.GOOGLE_SHEETS_URL }}
         run: |
           python main.py
 
@@ -55,3 +55,28 @@ jobs:
           name: immo-scanner-db-${{ github.run_number }}
           path: immo_scanner.db
           retention-days: 30
+
+  deploy-pwa:
+    runs-on: ubuntu-22.04
+    needs: scan
+    if: always()
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Repository auschecken
+        uses: actions/checkout@v4
+
+      - name: GitHub Pages konfigurieren
+        uses: actions/configure-pages@v4
+
+      - name: PWA Artefakt hochladen
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: web
+
+      - name: Auf GitHub Pages deployen
+        id: deployment
+        uses: actions/deploy-pages@v4

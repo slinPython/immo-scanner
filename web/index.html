@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Immo-Scanner Freiburg</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#1a1a2e">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <style>
+    :root {
+      --bg: #1a1a2e;
+      --surface: #16213e;
+      --card: #0f3460;
+      --accent: #e94560;
+      --accent2: #533483;
+      --text: #eee;
+      --text2: #aaa;
+      --green: #00d68f;
+      --yellow: #ffaa00;
+      --red: #ff3d71;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+    header {
+      background: var(--surface);
+      padding: 16px;
+      text-align: center;
+      border-bottom: 2px solid var(--accent);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    header h1 { font-size: 1.3rem; }
+    header p { color: var(--text2); font-size: 0.8rem; margin-top: 4px; }
+    .setup-banner {
+      background: var(--accent2);
+      padding: 12px 16px;
+      text-align: center;
+      font-size: 0.85rem;
+    }
+    .setup-banner input {
+      width: 100%;
+      max-width: 500px;
+      padding: 8px;
+      border-radius: 6px;
+      border: 1px solid var(--text2);
+      background: var(--surface);
+      color: var(--text);
+      margin-top: 8px;
+      font-size: 0.85rem;
+    }
+    .setup-banner button {
+      margin-top: 8px;
+      padding: 8px 20px;
+      border: none;
+      border-radius: 6px;
+      background: var(--accent);
+      color: white;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .kpi-bar {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      padding: 12px;
+    }
+    .kpi {
+      background: var(--surface);
+      border-radius: 8px;
+      padding: 10px;
+      text-align: center;
+    }
+    .kpi .val { font-size: 1.4rem; font-weight: bold; color: var(--accent); }
+    .kpi .label { font-size: 0.65rem; color: var(--text2); margin-top: 2px; }
+    .controls {
+      padding: 8px 12px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+    }
+    .controls input, .controls select {
+      padding: 6px 10px;
+      border-radius: 6px;
+      border: 1px solid #333;
+      background: var(--surface);
+      color: var(--text);
+      font-size: 0.8rem;
+      flex: 1;
+      min-width: 100px;
+    }
+    .controls select { flex: 0; min-width: 120px; }
+    .view-toggle {
+      display: flex;
+      gap: 4px;
+      padding: 0 12px 8px;
+    }
+    .view-toggle button {
+      padding: 6px 14px;
+      border: 1px solid var(--accent);
+      background: transparent;
+      color: var(--accent);
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.8rem;
+    }
+    .view-toggle button.active {
+      background: var(--accent);
+      color: white;
+    }
+    .listings { padding: 0 12px 80px; }
+    .card {
+      background: var(--surface);
+      border-radius: 10px;
+      padding: 14px;
+      margin-bottom: 10px;
+      border-left: 4px solid var(--text2);
+      cursor: pointer;
+      transition: transform 0.1s;
+    }
+    .card:active { transform: scale(0.98); }
+    .card.pass-nv { border-left-color: var(--green); }
+    .card.pass-wg { border-left-color: var(--yellow); }
+    .card.pass-both { border-left-color: var(--accent); }
+    .card .title {
+      font-weight: 600;
+      font-size: 0.95rem;
+      margin-bottom: 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .card .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      font-size: 0.78rem;
+      color: var(--text2);
+    }
+    .card .score {
+      position: absolute;
+      right: 14px;
+      top: 14px;
+      background: var(--card);
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-weight: bold;
+      font-size: 0.85rem;
+    }
+    .card { position: relative; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.75rem;
+    }
+    th, td {
+      padding: 8px 6px;
+      text-align: left;
+      border-bottom: 1px solid #222;
+    }
+    th {
+      background: var(--surface);
+      position: sticky;
+      top: 0;
+      cursor: pointer;
+    }
+    th:hover { color: var(--accent); }
+    tr:hover { background: var(--card); }
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.7);
+      z-index: 200;
+      justify-content: center;
+      align-items: flex-end;
+    }
+    .modal-overlay.active { display: flex; }
+    .modal {
+      background: var(--surface);
+      width: 100%;
+      max-width: 600px;
+      max-height: 85vh;
+      border-radius: 16px 16px 0 0;
+      padding: 20px;
+      overflow-y: auto;
+      animation: slideUp 0.2s ease;
+    }
+    @keyframes slideUp {
+      from { transform: translateY(100%); }
+      to { transform: translateY(0); }
+    }
+    .modal h2 { font-size: 1.1rem; margin-bottom: 12px; }
+    .modal .close-btn {
+      float: right;
+      background: none;
+      border: none;
+      color: var(--text2);
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+    .detail-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .detail-item {
+      background: var(--card);
+      padding: 10px;
+      border-radius: 8px;
+    }
+    .detail-item .dlabel { font-size: 0.7rem; color: var(--text2); }
+    .detail-item .dval { font-size: 1rem; font-weight: bold; margin-top: 2px; }
+    .detail-item.full { grid-column: 1 / -1; }
+    .btn-link {
+      display: block;
+      margin-top: 14px;
+      padding: 12px;
+      text-align: center;
+      background: var(--accent);
+      color: white;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--text2);
+    }
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: var(--text2);
+    }
+    .spinner {
+      width: 30px; height: 30px;
+      border: 3px solid var(--text2);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 10px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Immo-Scanner Freiburg</h1>
+    <p id="lastUpdate">Lade Daten...</p>
+  </header>
+  <div id="setupBanner" class="setup-banner" style="display:none;">
+    <div>Google Sheets Web-App URL eingeben:</div>
+    <input type="url" id="apiUrlInput" placeholder="https://script.google.com/macros/s/.../exec">
+    <br>
+    <button onclick="saveApiUrl()">Speichern</button>
+  </div>
+  <div class="kpi-bar">
+    <div class="kpi"><div class="val" id="kpiTotal">-</div><div class="label">Gesamt</div></div>
+    <div class="kpi"><div class="val" id="kpiPassNV">-</div><div class="label">Pass NV</div></div>
+    <div class="kpi"><div class="val" id="kpiPassWG">-</div><div class="label">Pass WG</div></div>
+    <div class="kpi"><div class="val" id="kpiAvgScore">-</div><div class="label">Avg Score</div></div>
+  </div>
+  <div class="controls">
+    <input type="search" id="searchInput" placeholder="Suche...">
+    <select id="platformFilter"><option value="">Alle Plattformen</option></select>
+    <select id="sortSelect">
+      <option value="score-desc">Score (hoch)</option>
+      <option value="score-asc">Score (niedrig)</option>
+      <option value="price-asc">Preis (niedrig)</option>
+      <option value="price-desc">Preis (hoch)</option>
+      <option value="rendite-desc">Rendite NV (hoch)</option>
+      <option value="rendite_wg-desc">Rendite WG (hoch)</option>
+      <option value="date-desc">Neueste zuerst</option>
+    </select>
+  </div>
+  <div class="view-toggle">
+    <button class="active" onclick="setView('cards')">Karten</button>
+    <button onclick="setView('table')">Tabelle</button>
+  </div>
+  <div id="loading" class="loading"><div class="spinner"></div><div>Lade Immobilien-Daten...</div></div>
+  <div id="listings" class="listings" style="display:none;"></div>
+  <div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+    <div class="modal" id="modal" onclick="event.stopPropagation()"></div>
+  </div>
+  <script>
+    const STORAGE_KEY='immo_scanner_api_url',CACHE_KEY='immo_scanner_cache';
+    let allListings=[],currentView='cards';
+    function getApiUrl(){return localStorage.getItem(STORAGE_KEY)||''}
+    function saveApiUrl(){const u=document.getElementById('apiUrlInput').value.trim();if(u){localStorage.setItem(STORAGE_KEY,u);document.getElementById('setupBanner').style.display='none';loadData()}}
+    async function loadData(){const apiUrl=getApiUrl();if(!apiUrl){document.getElementById('setupBanner').style.display='block';document.getElementById('loading').style.display='none';return}document.getElementById('loading').style.display='block';document.getElementById('listings').style.display='none';try{const r=await fetch(apiUrl+'?action=list');const d=await r.json();if(d.listings){allListings=d.listings;localStorage.setItem(CACHE_KEY,JSON.stringify({ts:Date.now(),listings:allListings}));checkNew(allListings)}}catch(e){console.error(e);const c=localStorage.getItem(CACHE_KEY);if(c){allListings=JSON.parse(c).listings||[]}}document.getElementById('loading').style.display='none';document.getElementById('listings').style.display='block';populatePlatforms();updateKPIs();renderListings();document.getElementById('lastUpdate').textContent='Aktualisiert: '+new Date().toLocaleString('de-DE')}
+    function checkNew(ls){if(!('Notification' in window))return;const lc=parseInt(localStorage.getItem('immo_last_check')||'0');const n=ls.filter(l=>{const d=new Date(l.found_date||0).getTime();return d>lc});if(n.length>0&&lc>0){if(Notification.permission==='granted')new Notification('Immo-Scanner',{body:n.length+' neue Objekte!',icon:'icon-192.png'});else if(Notification.permission!=='denied')Notification.requestPermission()}localStorage.setItem('immo_last_check',Date.now().toString())}
+    function populatePlatforms(){const ps=[...new Set(allListings.map(l=>l.platform||l.inserat||''))].filter(Boolean);const s=document.getElementById('platformFilter');s.innerHTML='<option value="">Alle Plattformen</option>';ps.forEach(p=>s.innerHTML+='<option value="'+p+'">'+p+'</option>')}
+    function getFiltered(){const q=document.getElementById('searchInput').value.toLowerCase(),pf=document.getElementById('platformFilter').value,so=document.getElementById('sortSelect').value;let f=allListings.filter(l=>{if(pf&&(l.platform||l.inserat||'')!==pf)return false;if(q){const h=[l.title||l.expose||'',l.address||l.stadt||'',l.platform||l.inserat||''].join(' ').toLowerCase();if(!h.includes(q))return false}return true});const[fd,dr]=so.split('-');f.sort((a,b)=>{let va,vb;if(fd==='score'){va=a.score||0;vb=b.score||0}else if(fd==='price'){va=a.price||a.kaufpreis||0;vb=b.price||b.kaufpreis||0}else if(fd==='rendite'){va=a.rendite_normal||a.rendite||0;vb=b.rendite_normal||b.rendite||0}else if(fd==='rendite_wg'){va=a.rendite_wg||0;vb=b.rendite_wg||0}else if(fd==='date'){va=new Date(a.found_date||0).getTime();vb=new Date(b.found_date||0).getTime()}else{va=0;vb=0}return dr==='desc'?vb-va:va-vb});return f}
+    function updateKPIs(){const l=getFiltered();document.getElementById('kpiTotal').textContent=l.length;document.getElementById('kpiPassNV').textContent=l.filter(x=>(x.rendite_normal||x.rendite||0)>=5).length;document.getElementById('kpiPassWG').textContent=l.filter(x=>(x.rendite_wg||0)>=6).length;document.getElementById('kpiAvgScore').textContent=l.length?Math.round(l.reduce((s,x)=>s+(x.score||0),0)/l.length):0}
+    function passClass(l){const nv=(l.rendite_normal||l.rendite||0)>=5,wg=(l.rendite_wg||0)>=6;if(nv&&wg)return'pass-both';if(nv)return'pass-nv';if(wg)return'pass-wg';return''}
+    function fmtPrice(v){return v?Number(v).toLocaleString('de-DE')+' EUR':'-'}
+    function renderListings(){const ls=getFiltered(),c=document.getElementById('listings');if(!ls.length){c.innerHTML='<div class="empty-state"><div>Keine Objekte gefunden</div></div>';return}if(currentView==='cards'){c.innerHTML=ls.map((l,i)=>'<div class="card '+passClass(l)+'" onclick="showDetail('+i+')"><div class="score">'+(l.score||0)+'</div><div class="title">'+(l.title||l.expose||'Kein Titel')+'</div><div class="meta"><span>'+fmtPrice(l.price||l.kaufpreis)+'</span><span>'+(l.rooms||l.zimmer||'?')+' Zi</span><span>'+(l.sqm||l.qm||'?')+' m2</span><span>NV '+Number(l.rendite_normal||l.rendite||0).toFixed(1)+'%</span><span>WG '+Number(l.rendite_wg||0).toFixed(1)+'%</span></div><div class="meta" style="margin-top:4px"><span>'+(l.address||l.stadt||'')+'</span><span>'+(l.platform||l.inserat||'')+'</span></div></div>').join('')}else{c.innerHTML='<div style="overflow-x:auto"><table><thead><tr><th>Titel</th><th>Preis</th><th>Zi</th><th>m2</th><th>NV%</th><th>WG%</th><th>Score</th></tr></thead><tbody>'+ls.map((l,i)=>'<tr onclick="showDetail('+i+')" style="cursor:pointer"><td>'+(l.title||l.expose||'').substring(0,30)+'</td><td>'+((l.price||l.kaufpreis||0)/1000).toFixed(0)+'k</td><td>'+(l.rooms||l.zimmer||'?')+'</td><td>'+(l.sqm||l.qm||'?')+'</td><td>'+Number(l.rendite_normal||l.rendite||0).toFixed(1)+'</td><td>'+Number(l.rendite_wg||0).toFixed(1)+'</td><td>'+(l.score||0)+'</td></tr>').join('')+'</tbody></table></div>'}}
+    function setView(v){currentView=v;document.querySelectorAll('.view-toggle button').forEach(b=>b.classList.remove('active'));event.target.classList.add('active');renderListings()}
+    function showDetail(idx){const ls=getFiltered(),l=ls[idx];if(!l)return;const p=l.price||l.kaufpreis||0,rn=l.rendite_normal||l.rendite||0,rw=l.rendite_wg||0,kf=l.kaufpreis_faktor||l.kaufpreisfaktor||0;document.getElementById('modal').innerHTML='<button class="close-btn" onclick="closeModal()">&times;</button><h2>'+(l.title||l.expose||'Detail')+'</h2><div class="detail-grid"><div class="detail-item"><div class="dlabel">Kaufpreis</div><div class="dval">'+fmtPrice(p)+'</div></div><div class="detail-item"><div class="dlabel">Score</div><div class="dval">'+(l.score||0)+' / 100</div></div><div class="detail-item"><div class="dlabel">Zimmer</div><div class="dval">'+(l.rooms||l.zimmer||'?')+'</div></div><div class="detail-item"><div class="dlabel">Flaeche</div><div class="dval">'+(l.sqm||l.qm||'?')+' m2</div></div><div class="detail-item"><div class="dlabel">Rendite Normal</div><div class="dval" style="color:'+(rn>=5?'var(--green)':'var(--red)')+'">'+Number(rn).toFixed(1)+' %</div></div><div class="detail-item"><div class="dlabel">Rendite WG</div><div class="dval" style="color:'+(rw>=6?'var(--green)':'var(--red)')+'">'+Number(rw).toFixed(1)+' %</div></div><div class="detail-item"><div class="dlabel">Kaufpreisfaktor</div><div class="dval">'+Number(kf).toFixed(1)+'</div></div><div class="detail-item"><div class="dlabel">Preis/Zimmer</div><div class="dval">'+fmtPrice(l.preis_pro_zimmer||0)+'</div></div><div class="detail-item full"><div class="dlabel">Adresse</div><div class="dval">'+(l.address||l.strasse||'')+(l.stadt?', '+l.stadt:'')+'</div></div><div class="detail-item full"><div class="dlabel">Empfehlung</div><div class="dval">'+(l.empfehlung||l.status||'-')+'</div></div><div class="detail-item"><div class="dlabel">Plattform</div><div class="dval">'+(l.platform||l.inserat||'-')+'</div></div><div class="detail-item"><div class="dlabel">Gefunden</div><div class="dval">'+(l.found_date||l.datum||'-')+'</div></div></div>'+(l.url?'<a class="btn-link" href="'+l.url+'" target="_blank" rel="noopener">Inserat oeffnen</a>':'');document.getElementById('modalOverlay').classList.add('active')}
+    function closeModal(e){if(!e||e.target===document.getElementById('modalOverlay'))document.getElementById('modalOverlay').classList.remove('active')}
+    document.getElementById('searchInput').addEventListener('input',()=>{updateKPIs();renderListings()});
+    document.getElementById('platformFilter').addEventListener('change',()=>{updateKPIs();renderListings()});
+    document.getElementById('sortSelect').addEventListener('change',()=>{updateKPIs();renderListings()});
+    if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(e=>console.log('SW:',e));
+    loadData();
+  </script>
+</body>
+</html>

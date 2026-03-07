@@ -213,10 +213,10 @@ def main():
             save_listing(conn, evaluated)
             new_listings.append(evaluated)
 
-            price_val = evaluated.get('price')
-            rn_val = evaluated.get('rendite_normal')
-            rw_val = evaluated.get('rendite_wg')
-            sc_val = evaluated.get('score')
+            price_val = evaluated.get('price') or 0
+            rn_val = evaluated.get('rendite_normal') or 0
+            rw_val = evaluated.get('rendite_wg') or 0
+            sc_val = evaluated.get('score') or 0
             logger.info(
                 f"NEU: [{evaluated['platform']}] {evaluated['title']} | "
                 f"{price_val:,.0f} EUR | "

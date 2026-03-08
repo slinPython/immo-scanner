@@ -11,6 +11,8 @@ import requests
 logger = logging.getLogger(__name__)
 
 SLACK_WEBHOOK_URL = os.environ.get("SLACK_WEBHOOK_URL", "")
+if SLACK_WEBHOOK_URL and not SLACK_WEBHOOK_URL.startswith("http"):
+    SLACK_WEBHOOK_URL = "https://" + SLACK_WEBHOOK_URL
 SLACK_BOT_TOKEN = os.environ.get("SLACK_BOT_TOKEN", "")
 SLACK_CHANNEL = os.environ.get("SLACK_CHANNEL", "#immo-scanner")
 

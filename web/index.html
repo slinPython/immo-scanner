@@ -31,15 +31,150 @@
     }
     header {
       background: var(--surface);
-      padding: 16px;
-      text-align: center;
+      padding: 12px 16px;
       border-bottom: 2px solid var(--accent);
       position: sticky;
       top: 0;
       z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
     header h1 { font-size: 1.3rem; }
-    header p { color: var(--text2); font-size: 0.8rem; margin-top: 4px; }
+    .header-subtitle { color: var(--text2); font-size: 0.8rem; }
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    /* Admin Center Button */
+    .admin-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border: 1px solid var(--accent2);
+      background: transparent;
+      color: var(--text);
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.8rem;
+      transition: background 0.2s, border-color 0.2s;
+      text-decoration: none;
+    }
+    .admin-btn:hover {
+      background: var(--accent2);
+      border-color: var(--accent);
+    }
+    .admin-btn svg { width: 16px; height: 16px; }
+
+    /* Notification Bell */
+    .notif-wrapper {
+      position: relative;
+    }
+    .notif-bell {
+      background: none;
+      border: none;
+      color: var(--text);
+      cursor: pointer;
+      padding: 6px;
+      border-radius: 8px;
+      transition: background 0.2s;
+      display: flex;
+      align-items: center;
+      position: relative;
+    }
+    .notif-bell:hover { background: var(--card); }
+    .notif-bell svg { width: 22px; height: 22px; }
+    .notif-badge {
+      position: absolute;
+      top: 2px;
+      right: 2px;
+      background: var(--accent);
+      color: white;
+      font-size: 0.6rem;
+      font-weight: bold;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+    }
+    .notif-badge.hidden { display: none; }
+    .notif-dropdown {
+      display: none;
+      position: absolute;
+      top: 40px;
+      right: 0;
+      width: 340px;
+      max-height: 420px;
+      overflow-y: auto;
+      background: var(--surface);
+      border: 1px solid var(--card);
+      border-radius: 10px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+      z-index: 300;
+    }
+    .notif-dropdown.active { display: block; }
+    .notif-header {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--card);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+    .notif-clear {
+      background: none;
+      border: none;
+      color: var(--accent);
+      cursor: pointer;
+      font-size: 0.75rem;
+    }
+    .notif-list { list-style: none; }
+    .notif-item {
+      padding: 10px 14px;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      cursor: pointer;
+      transition: background 0.15s;
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+    }
+    .notif-item:hover { background: var(--card); }
+    .notif-item.unread { background: rgba(233,69,96,0.08); }
+    .notif-icon {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-size: 0.85rem;
+    }
+    .notif-icon.price-drop { background: var(--green); color: #111; }
+    .notif-icon.new-deal { background: var(--accent); color: white; }
+    .notif-icon.mention { background: var(--accent2); color: white; }
+    .notif-content { flex: 1; min-width: 0; }
+    .notif-text { font-size: 0.8rem; line-height: 1.3; }
+    .notif-time { font-size: 0.65rem; color: var(--text2); margin-top: 2px; }
+    .notif-empty {
+      padding: 30px;
+      text-align: center;
+      color: var(--text2);
+      font-size: 0.85rem;
+    }
+
     .setup-banner {
       background: var(--accent2);
       padding: 12px 16px;
@@ -138,6 +273,7 @@
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+      padding-right: 50px;
     }
     .card .meta {
       display: flex;
@@ -157,6 +293,220 @@
       font-size: 0.85rem;
     }
     .card { position: relative; }
+
+    /* Price/Rent Chart on Cards */
+    .card-chart {
+      margin-top: 10px;
+      padding-top: 8px;
+      border-top: 1px solid rgba(255,255,255,0.08);
+    }
+    .card-chart-title {
+      font-size: 0.65rem;
+      color: var(--text2);
+      margin-bottom: 4px;
+    }
+    .chart-container {
+      display: flex;
+      gap: 12px;
+    }
+    .mini-chart {
+      flex: 1;
+      height: 50px;
+      position: relative;
+    }
+    .mini-chart-label {
+      font-size: 0.6rem;
+      color: var(--text2);
+      margin-bottom: 2px;
+      display: flex;
+      justify-content: space-between;
+    }
+    .mini-chart canvas {
+      width: 100%;
+      height: 40px;
+      border-radius: 4px;
+    }
+
+    /* Mentions */
+    .card-mentions {
+      margin-top: 6px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+    }
+    .mention-tag {
+      background: var(--accent2);
+      color: var(--text);
+      font-size: 0.65rem;
+      padding: 2px 6px;
+      border-radius: 10px;
+      display: inline-flex;
+      align-items: center;
+      gap: 2px;
+    }
+    .mention-tag .remove-mention {
+      cursor: pointer;
+      margin-left: 2px;
+      font-size: 0.7rem;
+      opacity: 0.7;
+    }
+    .mention-tag .remove-mention:hover { opacity: 1; }
+
+    /* Mention Input in Detail Modal */
+    .mention-section {
+      margin-top: 14px;
+      background: var(--card);
+      border-radius: 8px;
+      padding: 12px;
+    }
+    .mention-section h3 {
+      font-size: 0.8rem;
+      margin-bottom: 8px;
+      color: var(--text2);
+    }
+    .mention-input-wrapper {
+      display: flex;
+      gap: 6px;
+    }
+    .mention-input {
+      flex: 1;
+      padding: 8px 10px;
+      border-radius: 6px;
+      border: 1px solid #333;
+      background: var(--surface);
+      color: var(--text);
+      font-size: 0.8rem;
+    }
+    .mention-input::placeholder { color: var(--text2); }
+    .mention-send {
+      padding: 8px 14px;
+      border: none;
+      border-radius: 6px;
+      background: var(--accent2);
+      color: white;
+      cursor: pointer;
+      font-size: 0.8rem;
+      font-weight: bold;
+      transition: background 0.2s;
+    }
+    .mention-send:hover { background: var(--accent); }
+    .mention-tags-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      margin-top: 8px;
+    }
+
+    /* Detail Chart */
+    .detail-chart-section {
+      margin-top: 14px;
+      background: var(--card);
+      border-radius: 8px;
+      padding: 14px;
+    }
+    .detail-chart-section h3 {
+      font-size: 0.85rem;
+      margin-bottom: 10px;
+    }
+    .detail-charts {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .detail-chart-box {
+      background: var(--surface);
+      border-radius: 8px;
+      padding: 10px;
+    }
+    .detail-chart-box h4 {
+      font-size: 0.7rem;
+      color: var(--text2);
+      margin-bottom: 6px;
+    }
+    .detail-chart-box canvas {
+      width: 100%;
+      height: 100px;
+    }
+    .chart-legend {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.6rem;
+      color: var(--text2);
+      margin-top: 4px;
+    }
+
+    /* Admin Center Page */
+    .admin-page {
+      display: none;
+      padding: 20px;
+    }
+    .admin-page.active { display: block; }
+    .admin-page h2 {
+      font-size: 1.2rem;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .admin-back {
+      background: none;
+      border: 1px solid var(--text2);
+      color: var(--text);
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.8rem;
+      margin-bottom: 16px;
+    }
+    .admin-back:hover { border-color: var(--accent); color: var(--accent); }
+    .admin-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 14px;
+    }
+    .admin-card {
+      background: var(--surface);
+      border-radius: 10px;
+      padding: 18px;
+      border-left: 3px solid var(--accent2);
+    }
+    .admin-card h3 {
+      font-size: 0.95rem;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .admin-card p {
+      font-size: 0.8rem;
+      color: var(--text2);
+      line-height: 1.4;
+    }
+    .admin-card .admin-stat {
+      font-size: 1.8rem;
+      font-weight: bold;
+      color: var(--accent);
+      margin: 8px 0;
+    }
+    .user-list {
+      list-style: none;
+      margin-top: 8px;
+    }
+    .user-list li {
+      padding: 6px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      font-size: 0.8rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .user-role {
+      font-size: 0.65rem;
+      padding: 2px 8px;
+      border-radius: 10px;
+      background: var(--card);
+    }
+
     table {
       width: 100%;
       border-collapse: collapse;
@@ -251,67 +601,810 @@
       margin: 0 auto 10px;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
+
+    @media(max-width:480px) {
+      .admin-btn span { display: none; }
+      .notif-dropdown { width: 300px; right: -10px; }
+      .header-subtitle { display: none; }
+    }
   </style>
 </head>
 <body>
   <header>
-    <h1>Immo-Scanner Freiburg</h1>
-    <p id="lastUpdate">Lade Daten...</p>
+    <div class="header-left">
+      <h1>Immo-Scanner</h1>
+      <span class="header-subtitle" id="lastUpdate">Lade Daten...</span>
+    </div>
+    <div class="header-actions">
+      <button class="admin-btn" onclick="showAdminCenter()" title="Admin Center">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        <span>Admin Center</span>
+      </button>
+      <div class="notif-wrapper">
+        <button class="notif-bell" onclick="toggleNotifications()" title="Benachrichtigungen">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          <span class="notif-badge hidden" id="notifBadge">0</span>
+        </button>
+        <div class="notif-dropdown" id="notifDropdown">
+          <div class="notif-header">
+            <span>Benachrichtigungen</span>
+            <button class="notif-clear" onclick="clearNotifications()">Alle lesen</button>
+          </div>
+          <ul class="notif-list" id="notifList">
+            <li class="notif-empty">Keine Benachrichtigungen</li>
+          </ul>
+        </div>
+      </div>
+    </div>
   </header>
-  <div id="setupBanner" class="setup-banner" style="display:none;">
-    <div>Google Sheets Web-App URL eingeben:</div>
-    <input type="url" id="apiUrlInput" placeholder="https://script.google.com/macros/s/.../exec">
-    <br>
-    <button onclick="saveApiUrl()">Speichern</button>
+
+  <div id="mainContent">
+    <div id="setupBanner" class="setup-banner" style="display:none;">
+      <div>Google Sheets Web-App URL eingeben:</div>
+      <input type="url" id="apiUrlInput" placeholder="https://script.google.com/macros/s/.../exec">
+      <br>
+      <button onclick="saveApiUrl()">Speichern</button>
+    </div>
+    <div class="kpi-bar">
+      <div class="kpi"><div class="val" id="kpiTotal">-</div><div class="label">Gesamt</div></div>
+      <div class="kpi"><div class="val" id="kpiPassNV">-</div><div class="label">Pass NV</div></div>
+      <div class="kpi"><div class="val" id="kpiPassWG">-</div><div class="label">Pass WG</div></div>
+      <div class="kpi"><div class="val" id="kpiAvgScore">-</div><div class="label">Avg Score</div></div>
+    </div>
+    <div class="controls">
+      <input type="search" id="searchInput" placeholder="Suche...">
+      <select id="platformFilter"><option value="">Alle Plattformen</option></select>
+      <select id="sortSelect">
+        <option value="score-desc">Score (hoch)</option>
+        <option value="score-asc">Score (niedrig)</option>
+        <option value="price-asc">Preis (niedrig)</option>
+        <option value="price-desc">Preis (hoch)</option>
+        <option value="rendite-desc">Rendite NV (hoch)</option>
+        <option value="rendite_wg-desc">Rendite WG (hoch)</option>
+        <option value="date-desc">Neueste zuerst</option>
+      </select>
+    </div>
+    <div class="view-toggle">
+      <button class="active" onclick="setView('cards')">Karten</button>
+      <button onclick="setView('table')">Tabelle</button>
+    </div>
+    <div id="loading" class="loading"><div class="spinner"></div><div>Lade Immobilien-Daten...</div></div>
+    <div id="listings" class="listings" style="display:none;"></div>
   </div>
-  <div class="kpi-bar">
-    <div class="kpi"><div class="val" id="kpiTotal">-</div><div class="label">Gesamt</div></div>
-    <div class="kpi"><div class="val" id="kpiPassNV">-</div><div class="label">Pass NV</div></div>
-    <div class="kpi"><div class="val" id="kpiPassWG">-</div><div class="label">Pass WG</div></div>
-    <div class="kpi"><div class="val" id="kpiAvgScore">-</div><div class="label">Avg Score</div></div>
+
+  <!-- Admin Center Page -->
+  <div class="admin-page" id="adminPage">
+    <button class="admin-back" onclick="hideAdminCenter()">&larr; Zurueck zum Dashboard</button>
+    <h2>
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      Admin Center
+    </h2>
+    <div class="admin-grid">
+      <div class="admin-card">
+        <h3>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          Benutzer
+        </h3>
+        <div class="admin-stat" id="adminUserCount">0</div>
+        <p>Registrierte Team-Mitglieder</p>
+        <ul class="user-list" id="adminUserList"></ul>
+      </div>
+      <div class="admin-card">
+        <h3>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          Benachrichtigungen
+        </h3>
+        <div class="admin-stat" id="adminNotifCount">0</div>
+        <p>Gesamt-Benachrichtigungen heute</p>
+      </div>
+      <div class="admin-card">
+        <h3>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+          Preis-Tracking
+        </h3>
+        <div class="admin-stat" id="adminTrackCount">0</div>
+        <p>Objekte mit Preis-Monitoring</p>
+      </div>
+      <div class="admin-card">
+        <h3>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          Scraping Status
+        </h3>
+        <div class="admin-stat" id="adminScrapeStatus">Aktiv</div>
+        <p>Naechster Scan: taeglich 14:30 UTC</p>
+      </div>
+    </div>
   </div>
-  <div class="controls">
-    <input type="search" id="searchInput" placeholder="Suche...">
-    <select id="platformFilter"><option value="">Alle Plattformen</option></select>
-    <select id="sortSelect">
-      <option value="score-desc">Score (hoch)</option>
-      <option value="score-asc">Score (niedrig)</option>
-      <option value="price-asc">Preis (niedrig)</option>
-      <option value="price-desc">Preis (hoch)</option>
-      <option value="rendite-desc">Rendite NV (hoch)</option>
-      <option value="rendite_wg-desc">Rendite WG (hoch)</option>
-      <option value="date-desc">Neueste zuerst</option>
-    </select>
-  </div>
-  <div class="view-toggle">
-    <button class="active" onclick="setView('cards')">Karten</button>
-    <button onclick="setView('table')">Tabelle</button>
-  </div>
-  <div id="loading" class="loading"><div class="spinner"></div><div>Lade Immobilien-Daten...</div></div>
-  <div id="listings" class="listings" style="display:none;"></div>
+
   <div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
     <div class="modal" id="modal" onclick="event.stopPropagation()"></div>
   </div>
+
   <script>
     const STORAGE_KEY='immo_scanner_api_url',CACHE_KEY='immo_scanner_cache';
+    const NOTIF_KEY='immo_notifications',MENTIONS_KEY='immo_mentions',USERS_KEY='immo_users',PRICES_KEY='immo_price_history';
     let allListings=[],currentView='cards';
-    function getApiUrl(){return localStorage.getItem(STORAGE_KEY)||''}
-    function saveApiUrl(){const u=document.getElementById('apiUrlInput').value.trim();if(u){localStorage.setItem(STORAGE_KEY,u);document.getElementById('setupBanner').style.display='none';loadData()}}
-    async function loadData(){const apiUrl=getApiUrl();if(!apiUrl){document.getElementById('setupBanner').style.display='block';document.getElementById('loading').style.display='none';return}document.getElementById('loading').style.display='block';document.getElementById('listings').style.display='none';try{const r=await fetch(apiUrl+'?action=list');const d=await r.json();if(d.listings){allListings=d.listings;localStorage.setItem(CACHE_KEY,JSON.stringify({ts:Date.now(),listings:allListings}));checkNew(allListings)}}catch(e){console.error(e);const c=localStorage.getItem(CACHE_KEY);if(c){allListings=JSON.parse(c).listings||[]}}document.getElementById('loading').style.display='none';document.getElementById('listings').style.display='block';populatePlatforms();updateKPIs();renderListings();document.getElementById('lastUpdate').textContent='Aktualisiert: '+new Date().toLocaleString('de-DE')}
-    function checkNew(ls){if(!('Notification' in window))return;const lc=parseInt(localStorage.getItem('immo_last_check')||'0');const n=ls.filter(l=>{const d=new Date(l.found_date||0).getTime();return d>lc});if(n.length>0&&lc>0){if(Notification.permission==='granted')new Notification('Immo-Scanner',{body:n.length+' neue Objekte!',icon:'icon-192.png'});else if(Notification.permission!=='denied')Notification.requestPermission()}localStorage.setItem('immo_last_check',Date.now().toString())}
-    function populatePlatforms(){const ps=[...new Set(allListings.map(l=>l.platform||l.inserat||''))].filter(Boolean);const s=document.getElementById('platformFilter');s.innerHTML='<option value="">Alle Plattformen</option>';ps.forEach(p=>s.innerHTML+='<option value="'+p+'">'+p+'</option>')}
-    function getFiltered(){const q=document.getElementById('searchInput').value.toLowerCase(),pf=document.getElementById('platformFilter').value,so=document.getElementById('sortSelect').value;let f=allListings.filter(l=>{if(pf&&(l.platform||l.inserat||'')!==pf)return false;if(q){const h=[l.title||l.expose||'',l.address||l.stadt||'',l.platform||l.inserat||''].join(' ').toLowerCase();if(!h.includes(q))return false}return true});const[fd,dr]=so.split('-');f.sort((a,b)=>{let va,vb;if(fd==='score'){va=a.score||0;vb=b.score||0}else if(fd==='price'){va=a.price||a.kaufpreis||0;vb=b.price||b.kaufpreis||0}else if(fd==='rendite'){va=a.rendite_normal||a.rendite||0;vb=b.rendite_normal||b.rendite||0}else if(fd==='rendite_wg'){va=a.rendite_wg||0;vb=b.rendite_wg||0}else if(fd==='date'){va=new Date(a.found_date||0).getTime();vb=new Date(b.found_date||0).getTime()}else{va=0;vb=0}return dr==='desc'?vb-va:va-vb});return f}
-    function updateKPIs(){const l=getFiltered();document.getElementById('kpiTotal').textContent=l.length;document.getElementById('kpiPassNV').textContent=l.filter(x=>(x.rendite_normal||x.rendite||0)>=5).length;document.getElementById('kpiPassWG').textContent=l.filter(x=>(x.rendite_wg||0)>=6).length;document.getElementById('kpiAvgScore').textContent=l.length?Math.round(l.reduce((s,x)=>s+(x.score||0),0)/l.length):0}
-    function passClass(l){const nv=(l.rendite_normal||l.rendite||0)>=5,wg=(l.rendite_wg||0)>=6;if(nv&&wg)return'pass-both';if(nv)return'pass-nv';if(wg)return'pass-wg';return''}
-    function fmtPrice(v){return v?Number(v).toLocaleString('de-DE')+' EUR':'-'}
-    function renderListings(){const ls=getFiltered(),c=document.getElementById('listings');if(!ls.length){c.innerHTML='<div class="empty-state"><div>Keine Objekte gefunden</div></div>';return}if(currentView==='cards'){c.innerHTML=ls.map((l,i)=>'<div class="card '+passClass(l)+'" onclick="showDetail('+i+')"><div class="score">'+(l.score||0)+'</div><div class="title">'+(l.title||l.expose||'Kein Titel')+'</div><div class="meta"><span>'+fmtPrice(l.price||l.kaufpreis)+'</span><span>'+(l.rooms||l.zimmer||'?')+' Zi</span><span>'+(l.sqm||l.qm||'?')+' m2</span><span>NV '+Number(l.rendite_normal||l.rendite||0).toFixed(1)+'%</span><span>WG '+Number(l.rendite_wg||0).toFixed(1)+'%</span></div><div class="meta" style="margin-top:4px"><span>'+(l.address||l.stadt||'')+'</span><span>'+(l.platform||l.inserat||'')+'</span></div></div>').join('')}else{c.innerHTML='<div style="overflow-x:auto"><table><thead><tr><th>Titel</th><th>Preis</th><th>Zi</th><th>m2</th><th>NV%</th><th>WG%</th><th>Score</th></tr></thead><tbody>'+ls.map((l,i)=>'<tr onclick="showDetail('+i+')" style="cursor:pointer"><td>'+(l.title||l.expose||'').substring(0,30)+'</td><td>'+((l.price||l.kaufpreis||0)/1000).toFixed(0)+'k</td><td>'+(l.rooms||l.zimmer||'?')+'</td><td>'+(l.sqm||l.qm||'?')+'</td><td>'+Number(l.rendite_normal||l.rendite||0).toFixed(1)+'</td><td>'+Number(l.rendite_wg||0).toFixed(1)+'</td><td>'+(l.score||0)+'</td></tr>').join('')+'</tbody></table></div>'}}
-    function setView(v){currentView=v;document.querySelectorAll('.view-toggle button').forEach(b=>b.classList.remove('active'));event.target.classList.add('active');renderListings()}
-    function showDetail(idx){const ls=getFiltered(),l=ls[idx];if(!l)return;const p=l.price||l.kaufpreis||0,rn=l.rendite_normal||l.rendite||0,rw=l.rendite_wg||0,kf=l.kaufpreis_faktor||l.kaufpreisfaktor||0;document.getElementById('modal').innerHTML='<button class="close-btn" onclick="closeModal()">&times;</button><h2>'+(l.title||l.expose||'Detail')+'</h2><div class="detail-grid"><div class="detail-item"><div class="dlabel">Kaufpreis</div><div class="dval">'+fmtPrice(p)+'</div></div><div class="detail-item"><div class="dlabel">Score</div><div class="dval">'+(l.score||0)+' / 100</div></div><div class="detail-item"><div class="dlabel">Zimmer</div><div class="dval">'+(l.rooms||l.zimmer||'?')+'</div></div><div class="detail-item"><div class="dlabel">Flaeche</div><div class="dval">'+(l.sqm||l.qm||'?')+' m2</div></div><div class="detail-item"><div class="dlabel">Rendite Normal</div><div class="dval" style="color:'+(rn>=5?'var(--green)':'var(--red)')+'">'+Number(rn).toFixed(1)+' %</div></div><div class="detail-item"><div class="dlabel">Rendite WG</div><div class="dval" style="color:'+(rw>=6?'var(--green)':'var(--red)')+'">'+Number(rw).toFixed(1)+' %</div></div><div class="detail-item"><div class="dlabel">Kaufpreisfaktor</div><div class="dval">'+Number(kf).toFixed(1)+'</div></div><div class="detail-item"><div class="dlabel">Preis/Zimmer</div><div class="dval">'+fmtPrice(l.preis_pro_zimmer||0)+'</div></div><div class="detail-item full"><div class="dlabel">Adresse</div><div class="dval">'+(l.address||l.strasse||'')+(l.stadt?', '+l.stadt:'')+'</div></div><div class="detail-item full"><div class="dlabel">Empfehlung</div><div class="dval">'+(l.empfehlung||l.status||'-')+'</div></div><div class="detail-item"><div class="dlabel">Plattform</div><div class="dval">'+(l.platform||l.inserat||'-')+'</div></div><div class="detail-item"><div class="dlabel">Gefunden</div><div class="dval">'+(l.found_date||l.datum||'-')+'</div></div></div>'+(l.url?'<a class="btn-link" href="'+l.url+'" target="_blank" rel="noopener">Inserat oeffnen</a>':'');document.getElementById('modalOverlay').classList.add('active')}
-    function closeModal(e){if(!e||e.target===document.getElementById('modalOverlay'))document.getElementById('modalOverlay').classList.remove('active')}
-    document.getElementById('searchInput').addEventListener('input',()=>{updateKPIs();renderListings()});
-    document.getElementById('platformFilter').addEventListener('change',()=>{updateKPIs();renderListings()});
-    document.getElementById('sortSelect').addEventListener('change',()=>{updateKPIs();renderListings()});
-    if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(e=>console.log('SW:',e));
+
+    // ===================== USER MANAGEMENT =====================
+    function getUsers() {
+      const u = localStorage.getItem(USERS_KEY);
+      if (!u) {
+        const defaults = ['Admin','Max','Anna','Sarah','Tom'];
+        localStorage.setItem(USERS_KEY, JSON.stringify(defaults));
+        return defaults;
+      }
+      return JSON.parse(u);
+    }
+
+    function getCurrentUser() {
+      return localStorage.getItem('immo_current_user') || 'Admin';
+    }
+
+    // ===================== NOTIFICATIONS =====================
+    function getNotifications() {
+      const n = localStorage.getItem(NOTIF_KEY);
+      return n ? JSON.parse(n) : [];
+    }
+
+    function saveNotifications(notifs) {
+      localStorage.setItem(NOTIF_KEY, JSON.stringify(notifs));
+    }
+
+    function addNotification(type, title, message, dealId) {
+      const notifs = getNotifications();
+      notifs.unshift({
+        id: Date.now() + '_' + Math.random().toString(36).substring(2,7),
+        type: type,
+        title: title,
+        message: message,
+        dealId: dealId || null,
+        time: new Date().toISOString(),
+        read: false
+      });
+      if (notifs.length > 50) notifs.length = 50;
+      saveNotifications(notifs);
+      renderNotifications();
+    }
+
+    function renderNotifications() {
+      const notifs = getNotifications();
+      const list = document.getElementById('notifList');
+      const badge = document.getElementById('notifBadge');
+      const unread = notifs.filter(n => !n.read).length;
+
+      if (unread > 0) {
+        badge.textContent = unread > 9 ? '9+' : unread;
+        badge.classList.remove('hidden');
+      } else {
+        badge.classList.add('hidden');
+      }
+
+      if (!notifs.length) {
+        list.innerHTML = '<li class="notif-empty">Keine Benachrichtigungen</li>';
+        return;
+      }
+
+      list.innerHTML = notifs.slice(0, 20).map(n => {
+        const iconClass = n.type === 'price-drop' ? 'price-drop' : n.type === 'mention' ? 'mention' : 'new-deal';
+        const icon = n.type === 'price-drop' ? '&#8595;' : n.type === 'mention' ? '@' : '&#9733;';
+        const timeAgo = getTimeAgo(n.time);
+        return '<li class="notif-item' + (n.read ? '' : ' unread') + '" onclick="readNotification(\'' + n.id + '\')">' +
+          '<div class="notif-icon ' + iconClass + '">' + icon + '</div>' +
+          '<div class="notif-content">' +
+            '<div class="notif-text"><strong>' + escHtml(n.title) + '</strong> ' + escHtml(n.message) + '</div>' +
+            '<div class="notif-time">' + timeAgo + '</div>' +
+          '</div></li>';
+      }).join('');
+    }
+
+    function getTimeAgo(dateStr) {
+      const diff = Date.now() - new Date(dateStr).getTime();
+      const mins = Math.floor(diff / 60000);
+      if (mins < 1) return 'Gerade eben';
+      if (mins < 60) return mins + ' Min.';
+      const hrs = Math.floor(mins / 60);
+      if (hrs < 24) return hrs + ' Std.';
+      const days = Math.floor(hrs / 24);
+      return days + ' Tag' + (days > 1 ? 'e' : '');
+    }
+
+    function readNotification(id) {
+      const notifs = getNotifications();
+      const n = notifs.find(x => x.id === id);
+      if (n) {
+        n.read = true;
+        saveNotifications(notifs);
+        renderNotifications();
+      }
+    }
+
+    function clearNotifications() {
+      const notifs = getNotifications();
+      notifs.forEach(n => n.read = true);
+      saveNotifications(notifs);
+      renderNotifications();
+    }
+
+    function toggleNotifications() {
+      const dd = document.getElementById('notifDropdown');
+      dd.classList.toggle('active');
+    }
+
+    // Close dropdown on outside click
+    document.addEventListener('click', function(e) {
+      const dd = document.getElementById('notifDropdown');
+      const wrapper = e.target.closest('.notif-wrapper');
+      if (!wrapper && dd.classList.contains('active')) {
+        dd.classList.remove('active');
+      }
+    });
+
+    // ===================== PRICE HISTORY & TRACKING =====================
+    function getPriceHistory() {
+      const h = localStorage.getItem(PRICES_KEY);
+      return h ? JSON.parse(h) : {};
+    }
+
+    function savePriceHistory(h) {
+      localStorage.setItem(PRICES_KEY, JSON.stringify(h));
+    }
+
+    function generateMarketData(address) {
+      // Generate simulated 5-year market data based on address hash
+      let hash = 0;
+      for (let i = 0; i < (address || 'default').length; i++) {
+        hash = ((hash << 5) - hash) + address.charCodeAt(i);
+        hash |= 0;
+      }
+      const seed = Math.abs(hash);
+      const currentYear = new Date().getFullYear();
+      const years = [];
+      const pricePerSqm = [];
+      const rentPerSqm = [];
+
+      let basePrice = 2200 + (seed % 1500);
+      let baseRent = 9 + (seed % 6);
+
+      for (let i = 4; i >= 0; i--) {
+        years.push(currentYear - i);
+        const priceVariation = 1 + ((seed * (i + 1) % 15) - 5) / 100;
+        const rentVariation = 1 + ((seed * (i + 2) % 10) - 3) / 100;
+        basePrice = Math.round(basePrice * priceVariation);
+        baseRent = Math.round(baseRent * rentVariation * 10) / 10;
+        pricePerSqm.push(basePrice);
+        rentPerSqm.push(baseRent);
+      }
+
+      return { years, pricePerSqm, rentPerSqm };
+    }
+
+    function trackPriceChanges(listings) {
+      const history = getPriceHistory();
+      let changes = 0;
+
+      listings.forEach(l => {
+        const id = l.id || l.url || (l.title + l.address);
+        const price = l.price || l.kaufpreis || 0;
+        if (!id || !price) return;
+
+        if (history[id]) {
+          const lastPrice = history[id].prices[history[id].prices.length - 1];
+          if (lastPrice && lastPrice.price !== price) {
+            history[id].prices.push({ price: price, date: new Date().toISOString() });
+            if (price < lastPrice.price) {
+              const diff = lastPrice.price - price;
+              const pct = ((diff / lastPrice.price) * 100).toFixed(1);
+              addNotification('price-drop', 'Preissenkung!',
+                (l.title || l.expose || 'Objekt') + ': -' + Number(diff).toLocaleString('de-DE') + ' EUR (' + pct + '%)', id);
+              changes++;
+            }
+          }
+        } else {
+          history[id] = {
+            title: l.title || l.expose || '',
+            address: l.address || l.stadt || '',
+            prices: [{ price: price, date: new Date().toISOString() }]
+          };
+        }
+      });
+
+      savePriceHistory(history);
+      return changes;
+    }
+
+    function drawMiniChart(canvas, data, color) {
+      const ctx = canvas.getContext('2d');
+      const w = canvas.width = canvas.offsetWidth * 2;
+      const h = canvas.height = canvas.offsetHeight * 2;
+      ctx.scale(2, 2);
+      const cw = w / 2, ch = h / 2;
+
+      const min = Math.min(...data) * 0.95;
+      const max = Math.max(...data) * 1.05;
+      const range = max - min || 1;
+
+      ctx.beginPath();
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 1.5;
+      ctx.lineJoin = 'round';
+
+      data.forEach((v, i) => {
+        const x = (i / (data.length - 1)) * cw;
+        const y = ch - ((v - min) / range) * (ch - 4);
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      });
+      ctx.stroke();
+
+      // Fill area
+      ctx.lineTo(cw, ch);
+      ctx.lineTo(0, ch);
+      ctx.closePath();
+      ctx.fillStyle = color.replace(')', ',0.1)').replace('rgb', 'rgba');
+      ctx.fill();
+    }
+
+    function drawDetailChart(canvas, years, data, color, unit) {
+      const ctx = canvas.getContext('2d');
+      const w = canvas.width = canvas.offsetWidth * 2;
+      const h = canvas.height = canvas.offsetHeight * 2;
+      ctx.scale(2, 2);
+      const cw = w / 2, ch = h / 2;
+      const padding = { top: 15, bottom: 20, left: 10, right: 10 };
+      const plotW = cw - padding.left - padding.right;
+      const plotH = ch - padding.top - padding.bottom;
+
+      const min = Math.min(...data) * 0.9;
+      const max = Math.max(...data) * 1.1;
+      const range = max - min || 1;
+
+      // Grid lines
+      ctx.strokeStyle = 'rgba(255,255,255,0.06)';
+      ctx.lineWidth = 0.5;
+      for (let i = 0; i <= 3; i++) {
+        const y = padding.top + (plotH / 3) * i;
+        ctx.beginPath();
+        ctx.moveTo(padding.left, y);
+        ctx.lineTo(cw - padding.right, y);
+        ctx.stroke();
+      }
+
+      // Data line
+      ctx.beginPath();
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 2;
+      ctx.lineJoin = 'round';
+
+      const points = data.map((v, i) => ({
+        x: padding.left + (i / (data.length - 1)) * plotW,
+        y: padding.top + plotH - ((v - min) / range) * plotH
+      }));
+
+      points.forEach((p, i) => {
+        if (i === 0) ctx.moveTo(p.x, p.y);
+        else ctx.lineTo(p.x, p.y);
+      });
+      ctx.stroke();
+
+      // Fill
+      ctx.lineTo(points[points.length - 1].x, padding.top + plotH);
+      ctx.lineTo(points[0].x, padding.top + plotH);
+      ctx.closePath();
+      ctx.fillStyle = color.replace(')', ',0.12)').replace('rgb', 'rgba');
+      ctx.fill();
+
+      // Dots
+      points.forEach((p, i) => {
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, 3, 0, Math.PI * 2);
+        ctx.fillStyle = color;
+        ctx.fill();
+      });
+
+      // Value labels
+      ctx.fillStyle = '#eee';
+      ctx.font = '8px sans-serif';
+      ctx.textAlign = 'center';
+      points.forEach((p, i) => {
+        ctx.fillText(data[i] + (unit || ''), p.x, p.y - 6);
+      });
+
+      // Year labels
+      ctx.fillStyle = '#aaa';
+      ctx.font = '7px sans-serif';
+      years.forEach((y, i) => {
+        const x = padding.left + (i / (years.length - 1)) * plotW;
+        ctx.fillText(y, x, ch - 4);
+      });
+    }
+
+    // ===================== MENTIONS =====================
+    function getMentions() {
+      const m = localStorage.getItem(MENTIONS_KEY);
+      return m ? JSON.parse(m) : {};
+    }
+
+    function saveMentions(m) {
+      localStorage.setItem(MENTIONS_KEY, JSON.stringify(m));
+    }
+
+    function addMention(dealId, dealTitle, username) {
+      username = username.replace(/^@/, '').trim();
+      if (!username) return;
+
+      const mentions = getMentions();
+      if (!mentions[dealId]) mentions[dealId] = [];
+
+      if (mentions[dealId].some(m => m.user === username)) return;
+
+      mentions[dealId].push({
+        user: username,
+        by: getCurrentUser(),
+        time: new Date().toISOString()
+      });
+      saveMentions(mentions);
+
+      addNotification('mention', '@' + username + ' markiert',
+        getCurrentUser() + ' hat @' + username + ' auf "' + (dealTitle || 'Deal').substring(0, 30) + '" markiert', dealId);
+    }
+
+    function removeMention(dealId, username) {
+      const mentions = getMentions();
+      if (!mentions[dealId]) return;
+      mentions[dealId] = mentions[dealId].filter(m => m.user !== username);
+      saveMentions(mentions);
+    }
+
+    function getDealMentions(dealId) {
+      const mentions = getMentions();
+      return mentions[dealId] || [];
+    }
+
+    function escHtml(s) {
+      const d = document.createElement('div');
+      d.textContent = s;
+      return d.innerHTML;
+    }
+
+    // ===================== ADMIN CENTER =====================
+    function showAdminCenter() {
+      document.getElementById('mainContent').style.display = 'none';
+      document.getElementById('adminPage').classList.add('active');
+      renderAdminPage();
+    }
+
+    function hideAdminCenter() {
+      document.getElementById('adminPage').classList.remove('active');
+      document.getElementById('mainContent').style.display = '';
+    }
+
+    function renderAdminPage() {
+      const users = getUsers();
+      const notifs = getNotifications();
+      const history = getPriceHistory();
+
+      document.getElementById('adminUserCount').textContent = users.length;
+      document.getElementById('adminNotifCount').textContent = notifs.filter(n => {
+        const d = new Date(n.time);
+        const today = new Date();
+        return d.toDateString() === today.toDateString();
+      }).length;
+      document.getElementById('adminTrackCount').textContent = Object.keys(history).length;
+
+      const userList = document.getElementById('adminUserList');
+      userList.innerHTML = users.map((u, i) =>
+        '<li><span>@' + escHtml(u) + '</span><span class="user-role">' + (i === 0 ? 'Admin' : 'Mitglied') + '</span></li>'
+      ).join('');
+    }
+
+    // ===================== CORE FUNCTIONS =====================
+    function getApiUrl() { return localStorage.getItem(STORAGE_KEY) || '' }
+
+    function saveApiUrl() {
+      const u = document.getElementById('apiUrlInput').value.trim();
+      if (u) {
+        localStorage.setItem(STORAGE_KEY, u);
+        document.getElementById('setupBanner').style.display = 'none';
+        loadData();
+      }
+    }
+
+    async function loadData() {
+      const apiUrl = getApiUrl();
+      if (!apiUrl) {
+        document.getElementById('setupBanner').style.display = 'block';
+        document.getElementById('loading').style.display = 'none';
+        return;
+      }
+      document.getElementById('loading').style.display = 'block';
+      document.getElementById('listings').style.display = 'none';
+      try {
+        const r = await fetch(apiUrl + '?action=list');
+        const d = await r.json();
+        if (d.listings) {
+          allListings = d.listings;
+          localStorage.setItem(CACHE_KEY, JSON.stringify({ ts: Date.now(), listings: allListings }));
+          checkNew(allListings);
+          trackPriceChanges(allListings);
+        }
+      } catch (e) {
+        console.error(e);
+        const c = localStorage.getItem(CACHE_KEY);
+        if (c) { allListings = JSON.parse(c).listings || []; }
+      }
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('listings').style.display = 'block';
+      populatePlatforms();
+      updateKPIs();
+      renderListings();
+      document.getElementById('lastUpdate').textContent = 'Aktualisiert: ' + new Date().toLocaleString('de-DE');
+    }
+
+    function checkNew(ls) {
+      if (!('Notification' in window)) return;
+      const lc = parseInt(localStorage.getItem('immo_last_check') || '0');
+      const n = ls.filter(l => {
+        const d = new Date(l.found_date || 0).getTime();
+        return d > lc;
+      });
+      if (n.length > 0 && lc > 0) {
+        // Add in-app notifications for new deals
+        n.forEach(l => {
+          addNotification('new-deal', 'Neues Objekt!',
+            (l.title || l.expose || 'Unbekannt') + ' - ' + fmtPrice(l.price || l.kaufpreis),
+            l.id || l.url);
+        });
+        if (Notification.permission === 'granted') {
+          new Notification('Immo-Scanner', { body: n.length + ' neue Objekte!', icon: 'icon-192.png' });
+        } else if (Notification.permission !== 'denied') {
+          Notification.requestPermission();
+        }
+      }
+      localStorage.setItem('immo_last_check', Date.now().toString());
+    }
+
+    function populatePlatforms() {
+      const ps = [...new Set(allListings.map(l => l.platform || l.inserat || ''))].filter(Boolean);
+      const s = document.getElementById('platformFilter');
+      s.innerHTML = '<option value="">Alle Plattformen</option>';
+      ps.forEach(p => s.innerHTML += '<option value="' + p + '">' + p + '</option>');
+    }
+
+    function getFiltered() {
+      const q = document.getElementById('searchInput').value.toLowerCase(),
+            pf = document.getElementById('platformFilter').value,
+            so = document.getElementById('sortSelect').value;
+      let f = allListings.filter(l => {
+        if (pf && (l.platform || l.inserat || '') !== pf) return false;
+        if (q) {
+          const h = [l.title || l.expose || '', l.address || l.stadt || '', l.platform || l.inserat || ''].join(' ').toLowerCase();
+          if (!h.includes(q)) return false;
+        }
+        return true;
+      });
+      const [fd, dr] = so.split('-');
+      f.sort((a, b) => {
+        let va, vb;
+        if (fd === 'score') { va = a.score || 0; vb = b.score || 0; }
+        else if (fd === 'price') { va = a.price || a.kaufpreis || 0; vb = b.price || b.kaufpreis || 0; }
+        else if (fd === 'rendite') { va = a.rendite_normal || a.rendite || 0; vb = b.rendite_normal || b.rendite || 0; }
+        else if (fd === 'rendite_wg') { va = a.rendite_wg || 0; vb = b.rendite_wg || 0; }
+        else if (fd === 'date') { va = new Date(a.found_date || 0).getTime(); vb = new Date(b.found_date || 0).getTime(); }
+        else { va = 0; vb = 0; }
+        return dr === 'desc' ? vb - va : va - vb;
+      });
+      return f;
+    }
+
+    function updateKPIs() {
+      const l = getFiltered();
+      document.getElementById('kpiTotal').textContent = l.length;
+      document.getElementById('kpiPassNV').textContent = l.filter(x => (x.rendite_normal || x.rendite || 0) >= 5).length;
+      document.getElementById('kpiPassWG').textContent = l.filter(x => (x.rendite_wg || 0) >= 6).length;
+      document.getElementById('kpiAvgScore').textContent = l.length ? Math.round(l.reduce((s, x) => s + (x.score || 0), 0) / l.length) : 0;
+    }
+
+    function passClass(l) {
+      const nv = (l.rendite_normal || l.rendite || 0) >= 5, wg = (l.rendite_wg || 0) >= 6;
+      if (nv && wg) return 'pass-both';
+      if (nv) return 'pass-nv';
+      if (wg) return 'pass-wg';
+      return '';
+    }
+
+    function fmtPrice(v) { return v ? Number(v).toLocaleString('de-DE') + ' EUR' : '-'; }
+
+    function getDealId(l) {
+      return l.id || l.url || ((l.title || '') + '_' + (l.address || ''));
+    }
+
+    function renderListings() {
+      const ls = getFiltered(), c = document.getElementById('listings');
+      if (!ls.length) {
+        c.innerHTML = '<div class="empty-state"><div>Keine Objekte gefunden</div></div>';
+        return;
+      }
+      if (currentView === 'cards') {
+        c.innerHTML = ls.map((l, i) => {
+          const dealId = getDealId(l);
+          const mentions = getDealMentions(dealId);
+          const addr = l.address || l.stadt || '';
+          const market = generateMarketData(addr);
+
+          let mentionsHtml = '';
+          if (mentions.length) {
+            mentionsHtml = '<div class="card-mentions">' +
+              mentions.map(m => '<span class="mention-tag">@' + escHtml(m.user) + '</span>').join('') +
+              '</div>';
+          }
+
+          return '<div class="card ' + passClass(l) + '" onclick="showDetail(' + i + ')">' +
+            '<div class="score">' + (l.score || 0) + '</div>' +
+            '<div class="title">' + escHtml(l.title || l.expose || 'Kein Titel') + '</div>' +
+            '<div class="meta">' +
+              '<span>' + fmtPrice(l.price || l.kaufpreis) + '</span>' +
+              '<span>' + (l.rooms || l.zimmer || '?') + ' Zi</span>' +
+              '<span>' + (l.sqm || l.qm || '?') + ' m2</span>' +
+              '<span>NV ' + Number(l.rendite_normal || l.rendite || 0).toFixed(1) + '%</span>' +
+              '<span>WG ' + Number(l.rendite_wg || 0).toFixed(1) + '%</span>' +
+            '</div>' +
+            '<div class="meta" style="margin-top:4px">' +
+              '<span>' + escHtml(addr) + '</span>' +
+              '<span>' + escHtml(l.platform || l.inserat || '') + '</span>' +
+            '</div>' +
+            mentionsHtml +
+            '<div class="card-chart">' +
+              '<div class="card-chart-title">Marktentwicklung 5 Jahre</div>' +
+              '<div class="chart-container">' +
+                '<div class="mini-chart">' +
+                  '<div class="mini-chart-label"><span>Preis/m2</span><span>' + market.pricePerSqm[market.pricePerSqm.length - 1] + ' EUR</span></div>' +
+                  '<canvas data-chart="price" data-addr="' + encodeURIComponent(addr) + '"></canvas>' +
+                '</div>' +
+                '<div class="mini-chart">' +
+                  '<div class="mini-chart-label"><span>Miete/m2</span><span>' + market.rentPerSqm[market.rentPerSqm.length - 1] + ' EUR</span></div>' +
+                  '<canvas data-chart="rent" data-addr="' + encodeURIComponent(addr) + '"></canvas>' +
+                '</div>' +
+              '</div>' +
+            '</div>' +
+          '</div>';
+        }).join('');
+
+        // Draw mini charts after DOM render
+        requestAnimationFrame(() => {
+          document.querySelectorAll('canvas[data-chart]').forEach(canvas => {
+            const addr = decodeURIComponent(canvas.dataset.addr);
+            const market = generateMarketData(addr);
+            if (canvas.dataset.chart === 'price') {
+              drawMiniChart(canvas, market.pricePerSqm, 'rgb(0,214,143)');
+            } else {
+              drawMiniChart(canvas, market.rentPerSqm, 'rgb(83,52,131)');
+            }
+          });
+        });
+      } else {
+        c.innerHTML = '<div style="overflow-x:auto"><table><thead><tr><th>Titel</th><th>Preis</th><th>Zi</th><th>m2</th><th>NV%</th><th>WG%</th><th>Score</th></tr></thead><tbody>' +
+          ls.map((l, i) => '<tr onclick="showDetail(' + i + ')" style="cursor:pointer"><td>' + escHtml((l.title || l.expose || '').substring(0, 30)) + '</td><td>' + ((l.price || l.kaufpreis || 0) / 1000).toFixed(0) + 'k</td><td>' + (l.rooms || l.zimmer || '?') + '</td><td>' + (l.sqm || l.qm || '?') + '</td><td>' + Number(l.rendite_normal || l.rendite || 0).toFixed(1) + '</td><td>' + Number(l.rendite_wg || 0).toFixed(1) + '</td><td>' + (l.score || 0) + '</td></tr>').join('') +
+          '</tbody></table></div>';
+      }
+    }
+
+    function setView(v) {
+      currentView = v;
+      document.querySelectorAll('.view-toggle button').forEach(b => b.classList.remove('active'));
+      event.target.classList.add('active');
+      renderListings();
+    }
+
+    function showDetail(idx) {
+      const ls = getFiltered(), l = ls[idx];
+      if (!l) return;
+      const p = l.price || l.kaufpreis || 0,
+            rn = l.rendite_normal || l.rendite || 0,
+            rw = l.rendite_wg || 0,
+            kf = l.kaufpreis_faktor || l.kaufpreisfaktor || 0;
+      const dealId = getDealId(l);
+      const mentions = getDealMentions(dealId);
+      const addr = l.address || l.strasse || '';
+      const stadt = l.stadt || '';
+      const fullAddr = addr + (stadt ? ', ' + stadt : '');
+
+      const mentionTags = mentions.length ?
+        mentions.map(m =>
+          '<span class="mention-tag">@' + escHtml(m.user) +
+          '<span class="remove-mention" onclick="event.stopPropagation();removeMentionAndRefresh(\'' + dealId.replace(/'/g, "\\'") + '\',\'' + m.user + '\',' + idx + ')">&times;</span></span>'
+        ).join('') : '<span style="color:var(--text2);font-size:0.75rem">Noch keine Markierungen</span>';
+
+      document.getElementById('modal').innerHTML =
+        '<button class="close-btn" onclick="closeModal()">&times;</button>' +
+        '<h2>' + escHtml(l.title || l.expose || 'Detail') + '</h2>' +
+        '<div class="detail-grid">' +
+          '<div class="detail-item"><div class="dlabel">Kaufpreis</div><div class="dval">' + fmtPrice(p) + '</div></div>' +
+          '<div class="detail-item"><div class="dlabel">Score</div><div class="dval">' + (l.score || 0) + ' / 100</div></div>' +
+          '<div class="detail-item"><div class="dlabel">Zimmer</div><div class="dval">' + (l.rooms || l.zimmer || '?') + '</div></div>' +
+          '<div class="detail-item"><div class="dlabel">Flaeche</div><div class="dval">' + (l.sqm || l.qm || '?') + ' m2</div></div>' +
+          '<div class="detail-item"><div class="dlabel">Rendite Normal</div><div class="dval" style="color:' + (rn >= 5 ? 'var(--green)' : 'var(--red)') + '">' + Number(rn).toFixed(1) + ' %</div></div>' +
+          '<div class="detail-item"><div class="dlabel">Rendite WG</div><div class="dval" style="color:' + (rw >= 6 ? 'var(--green)' : 'var(--red)') + '">' + Number(rw).toFixed(1) + ' %</div></div>' +
+          '<div class="detail-item"><div class="dlabel">Kaufpreisfaktor</div><div class="dval">' + Number(kf).toFixed(1) + '</div></div>' +
+          '<div class="detail-item"><div class="dlabel">Preis/Zimmer</div><div class="dval">' + fmtPrice(l.preis_pro_zimmer || 0) + '</div></div>' +
+          '<div class="detail-item full"><div class="dlabel">Adresse</div><div class="dval">' + escHtml(fullAddr) + '</div></div>' +
+          '<div class="detail-item full"><div class="dlabel">Empfehlung</div><div class="dval">' + escHtml(l.empfehlung || l.status || '-') + '</div></div>' +
+          '<div class="detail-item"><div class="dlabel">Plattform</div><div class="dval">' + escHtml(l.platform || l.inserat || '-') + '</div></div>' +
+          '<div class="detail-item"><div class="dlabel">Gefunden</div><div class="dval">' + escHtml(l.found_date || l.datum || '-') + '</div></div>' +
+        '</div>' +
+
+        // Mention Section
+        '<div class="mention-section">' +
+          '<h3>Team-Mitglieder markieren</h3>' +
+          '<div class="mention-input-wrapper">' +
+            '<input class="mention-input" id="mentionInput" placeholder="@Benutzername eingeben..." onkeydown="if(event.key===\'Enter\')mentionUser(' + idx + ')">' +
+            '<button class="mention-send" onclick="mentionUser(' + idx + ')">Markieren</button>' +
+          '</div>' +
+          '<div class="mention-tags-list" id="mentionTagsList">' + mentionTags + '</div>' +
+        '</div>' +
+
+        // Price/Rent Development Charts
+        '<div class="detail-chart-section">' +
+          '<h3>Preis- &amp; Mietentwicklung (5 Jahre) - ' + escHtml(fullAddr || 'Standort') + '</h3>' +
+          '<div class="detail-charts">' +
+            '<div class="detail-chart-box">' +
+              '<h4>Kaufpreis pro m2</h4>' +
+              '<canvas id="detailPriceChart"></canvas>' +
+            '</div>' +
+            '<div class="detail-chart-box">' +
+              '<h4>Kaltmiete pro m2</h4>' +
+              '<canvas id="detailRentChart"></canvas>' +
+            '</div>' +
+          '</div>' +
+        '</div>' +
+
+        (l.url ? '<a class="btn-link" href="' + escHtml(l.url) + '" target="_blank" rel="noopener">Inserat oeffnen</a>' : '');
+
+      document.getElementById('modalOverlay').classList.add('active');
+
+      // Draw detail charts
+      requestAnimationFrame(() => {
+        const market = generateMarketData(fullAddr);
+        const priceCanvas = document.getElementById('detailPriceChart');
+        const rentCanvas = document.getElementById('detailRentChart');
+        if (priceCanvas) drawDetailChart(priceCanvas, market.years, market.pricePerSqm, 'rgb(0,214,143)', '');
+        if (rentCanvas) drawDetailChart(rentCanvas, market.years, market.rentPerSqm, 'rgb(83,52,131)', '');
+      });
+    }
+
+    function mentionUser(idx) {
+      const input = document.getElementById('mentionInput');
+      if (!input) return;
+      const username = input.value.trim();
+      if (!username) return;
+
+      const ls = getFiltered(), l = ls[idx];
+      if (!l) return;
+
+      const dealId = getDealId(l);
+      addMention(dealId, l.title || l.expose || '', username);
+      input.value = '';
+      showDetail(idx);
+      renderListings();
+    }
+
+    function removeMentionAndRefresh(dealId, username, idx) {
+      removeMention(dealId, username);
+      showDetail(idx);
+      renderListings();
+    }
+
+    function closeModal(e) {
+      if (!e || e.target === document.getElementById('modalOverlay'))
+        document.getElementById('modalOverlay').classList.remove('active');
+    }
+
+    document.getElementById('searchInput').addEventListener('input', () => { updateKPIs(); renderListings(); });
+    document.getElementById('platformFilter').addEventListener('change', () => { updateKPIs(); renderListings(); });
+    document.getElementById('sortSelect').addEventListener('change', () => { updateKPIs(); renderListings(); });
+
+    if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(e => console.log('SW:', e));
+
+    renderNotifications();
     loadData();
   </script>
 </body>

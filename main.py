@@ -197,7 +197,9 @@ def main():
     conn = init_db()
     evaluator = BierdeckelEvaluator(config)
     scraper = ImmobilienScraper(config)
-    webapp_url = os.environ.get('GOOGLE_SHEETS_WEBAPP_URL')
+    webapp_url = os.environ.get('GOOGLE_SHEETS_WEBAPP_URL', '')
+    if webapp_url and not webapp_url.startswith('http'):
+        webapp_url = 'https://' + webapp_url
 
     try:
         raw_listings = scraper.scrape_all(limit=args.limit)
